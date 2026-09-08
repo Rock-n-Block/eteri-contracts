@@ -1,4 +1,4 @@
-# b2b-contracts
+# eteri-contracts
 
 ## Smart Contract Description
 
