@@ -10,8 +10,8 @@ contract Invoice is OwnableUpgradeable {
 
     address public customer;
 
-    event Accept();
-    event Refund();
+    event Accept(IERC20 token, uint256 value);
+    event Refund(IERC20 token, uint256 value);
     event Withdraw(IERC20 indexed token, uint256 value);
 
     error PaymentDeadlineNotPassed(uint256 paymentDeadline, uint256 currentTimestamp);
@@ -27,22 +27,22 @@ contract Invoice is OwnableUpgradeable {
      * @param merchant The recipient address of the funds if the payment is accepted.
      * @param _customer The customer address who will receive refunds or assets withdrawn later.
      * @param token The token address used for payment.
+     * @param value Token amount to be withdrawn during settlement.
      * @param paymentDeadline The unix timestamp after which the merchant is allowed to accept funds.
      * @param merchantChoiceDeadline The unix timestamp after which the customer is refunded.
      * @return A boolean indicating whether the invoice was settled and accepted (`true`) or refunded (`false`).
      */
-    function initialize(address merchant, address _customer, IERC20 token, uint256 paymentDeadline, uint256 merchantChoiceDeadline) external virtual initializer returns(bool) {
+    function initialize(address merchant, address _customer, IERC20 token, uint256 value, uint256 paymentDeadline, uint256 merchantChoiceDeadline) external virtual initializer returns(bool) {
         __Ownable_init(_msgSender());
         customer = _customer;
-        uint256 value = address(token) == MOCK_NATIVE_ADDRESS ? address(this).balance : token.balanceOf(address(this));
         if (block.timestamp > merchantChoiceDeadline) {
             _transfer(token, customer, value);
-            emit Refund();
+            emit Refund(token, value);
             return false;
         }
         else if (block.timestamp > paymentDeadline) {
             _transfer(token, merchant, value);
-            emit Accept();
+            emit Accept(token, value);
             return true;
         }
         else {
@@ -62,7 +62,7 @@ contract Invoice is OwnableUpgradeable {
     }
 
     function _transfer(IERC20 token, address receiver, uint256 value) internal virtual {
-        if (address(token) == 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE) {
+        if (address(token) == MOCK_NATIVE_ADDRESS) {
             _nativeTransfer(receiver, value);
         }
         else {

@@ -1,6 +1,6 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-const {ADMIN, VALIDATOR} = process.env;
+const {ADMIN, VALIDATOR, PAUSER, UNPAUSER, MIN_SIGNATURES} = process.env;
 
 export default buildModule("InvoiceFactory", (m) => {
 
@@ -13,7 +13,7 @@ export default buildModule("InvoiceFactory", (m) => {
         m.encodeFunctionCall(
             InvoiceFactoryImplementation,
             "initialize",
-            [ADMIN, VALIDATOR, InvoiceImplementation]
+            [ADMIN, VALIDATOR, PAUSER, UNPAUSER, InvoiceImplementation, MIN_SIGNATURES]
         )
     ]);
 

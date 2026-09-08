@@ -2,6 +2,7 @@
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "5.6.1",
     "@openzeppelin/hardhat-upgrades": "^4.0.2",
+    "@openzeppelin/tron-contracts": "5.6.0-rc.2",
     "dotenv": "^17.4.2",
     "hardhat": "^3.9.0"
   },
